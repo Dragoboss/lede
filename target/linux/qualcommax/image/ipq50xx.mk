@@ -5,6 +5,29 @@ define Device/EmmcImage
 	IMAGE/sysupgrade.bin/squashfs := append-rootfs | pad-to 64k | sysupgrade-tar rootfs=$$$$@ | append-metadata
 endef
 
+define Device/brax-fa532
+	$(call Device/FitImage)
+	$(call Device/UbiFit)
+	DEVICE_VENDOR := Xunison
+	DEVICE_MODEL := Brax-FA532
+	BLOCKSIZE := 128k
+	PAGESIZE := 2048
+	DEVICE_DTS_CONFIG := config@mp03.1
+	SOC := ipq5018
+	KERNEL_SIZE := 36864k
+	NAND_SIZE := 128m
+	DEVICE_PACKAGES := kmod-ath11k-pci \
+		ath11k-firmware-qcn9074 \
+		kmod-ath10k kmod-ath10k-smallbuffers \
+		ath10k-firmware-qca9887 \
+		ipq-wifi-xiaomi_ax6000
+ifneq ($(CONFIG_TARGET_ROOTFS_INITRAMFS),)
+	ARTIFACTS := initramfs-factory.ubi
+	ARTIFACT/initramfs-factory.ubi := append-image-stage initramfs-uImage.itb | ubinize-kernel
+endif
+endef
+TARGET_DEVICES += brax-fa532
+
 define Device/glinet_gl-b3000
 	$(call Device/FitImage)
 	$(call Device/UbiFit)
